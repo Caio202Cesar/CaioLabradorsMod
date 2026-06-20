@@ -1,0 +1,37 @@
+{
+  "labrador_angry": {
+    "category": "biomes",
+    "subtitle": "caiolabradorsmod.labrador_angry",
+    "sounds": [
+      "caiolabradorsmod:labrador_angry"
+    ]
+  },
+  "labrador_bark2": {
+    "category": "biomes",
+    "subtitle": "caiolabradorsmod.labrador_bark2",
+    "sounds": [
+      "caiolabradorsmod:labrador_bark2"
+    ]
+  },
+  "labrador_bark_ambient": {
+    "category": "biomes",
+    "subtitle": "caiolabradorsmod.labrador_bark_ambient",
+    "sounds": [
+      "caiolabradorsmod:labrador_bark_ambient"
+    ]
+  },
+  "labrador_breathing": {
+    "category": "biomes",
+    "subtitle": "caiolabradorsmod.labrador_breathing",
+    "sounds": [
+      "caiolabradorsmod:labrador_breathing"
+    ]
+  },
+  "labrador_purr": {
+    "category": "biomes",
+    "subtitle": "caiolabradorsmod.labrador_purr",
+    "sounds": [
+      "caiolabradorsmod:labrador_purr"
+    ]
+  }
+}
