@@ -1,4 +1,4 @@
-package com.example.examplemod;
+package com.caiocesarmods.caiolabradorsmod;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -19,13 +19,14 @@ import org.apache.logging.log4j.Logger;
 import java.util.stream.Collectors;
 
 // The value here should match an entry in the META-INF/mods.toml file
-@Mod("examplemod")
-public class ExampleMod
-{
-    // Directly reference a log4j logger.
+@Mod(CaioLabradorsMod.MOD_ID)
+public class CaioLabradorsMod {
+
+    public static final String MOD_ID = "caiolabradorsmod";
+
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public ExampleMod() {
+    public CaioLabradorsMod() {
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         // Register the enqueueIMC method for modloading
