@@ -1,5 +1,6 @@
 package com.caiocesarmods.caiolabradorsmod.entity.custom;
 
+import com.google.common.collect.Maps;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.monster.AbstractSkeletonEntity;
@@ -8,9 +9,24 @@ import net.minecraft.entity.passive.TurtleEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.passive.horse.LlamaEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.world.World;
 
+import java.util.Map;
+
 public class LabradorEntity extends WolfEntity {
+    private static final DataParameter<Integer> VARIANT =
+            EntityDataManager.createKey(LabradorEntity.class, DataSerializers.VARINT);
+    public static final Map<Integer, ResourceLocation> TEXTURE_BY_ID = Util.make(Maps.newHashMap(), (p_213410_0_) -> {
+        p_213410_0_.put(0, new ResourceLocation("textures/entity/yellow_lab.png"));
+        p_213410_0_.put(1, new ResourceLocation("textures/entity/white_lab.png"));
+        p_213410_0_.put(2, new ResourceLocation("textures/entity/black_lab.png"));
+        p_213410_0_.put(3, new ResourceLocation("textures/entity/brown_lab.png"));
+    });
 
     public LabradorEntity(EntityType<? extends WolfEntity> type, World worldIn) {
         super(type, worldIn);
@@ -37,4 +53,5 @@ public class LabradorEntity extends WolfEntity {
         this.targetSelector.addGoal(7, new NearestAttackableTargetGoal<>(this, AbstractSkeletonEntity.class, false));
         this.targetSelector.addGoal(8, new ResetAngerGoal<>(this, true));
     }
+
 }
