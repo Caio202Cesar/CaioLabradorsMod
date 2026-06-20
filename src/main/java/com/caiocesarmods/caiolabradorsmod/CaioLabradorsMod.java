@@ -1,5 +1,6 @@
 package com.caiocesarmods.caiolabradorsmod;
 
+import com.caiocesarmods.caiolabradorsmod.Util.ModSoundEvents;
 import com.caiocesarmods.caiolabradorsmod.entity.ModEntityTypes;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
