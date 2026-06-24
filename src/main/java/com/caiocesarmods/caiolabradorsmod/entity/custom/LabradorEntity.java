@@ -60,38 +60,6 @@ public class LabradorEntity extends WolfEntity {
                 .createMutableAttribute(Attributes.FOLLOW_RANGE, 32.0D);
     }
 
-    /*private byte geneB1;
-    private byte geneB2;
-
-    private byte geneE1;
-    private byte geneE2;
-
-    private boolean whiteGene;
-
-    public LabradorVariant calculateColor() {
-
-        if (whiteGene)
-            return LabradorVariant.WHITE;
-
-        boolean hasDominantB =
-                geneB1 == 1 || geneB2 == 1;
-
-        boolean hasDominantE =
-                geneE1 == 1 || geneE2 == 1;
-
-        if (!hasDominantE)
-            return LabradorVariant.YELLOW;
-
-        if (!hasDominantB)
-            return LabradorVariant.BROWN;
-
-        return LabradorVariant.BLACK;
-    }
-
-    public void updateVariant() {
-        this.setVariant(calculateColor());
-    }*/
-
     @Override
     public void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
@@ -123,13 +91,13 @@ public class LabradorEntity extends WolfEntity {
 
         int roll = this.rand.nextInt(100);
 
-        if (roll < 50)
+        if (roll < 25)
             setVariant(LabradorVariant.YELLOW);
 
-        else if (roll < 80)
+        else if (roll < 50)
             setVariant(LabradorVariant.BLACK);
 
-        else if (roll < 95)
+        else if (roll < 75)
             setVariant(LabradorVariant.BROWN);
 
         else
@@ -219,20 +187,40 @@ public class LabradorEntity extends WolfEntity {
     }
 
     @Override
-    public SoundEvent getAmbientSound() {
-        this.playSound(ModSoundEvents.LABRADOR_BARK2.get(), 0.7F, 1.0F);
-        return null;
+    protected SoundEvent getAmbientSound() {
+
+        if (this.isAngry()) {
+
+            return this.rand.nextBoolean()
+                    ? ModSoundEvents.LABRADOR_ANGRY.get()
+                    : ModSoundEvents.LABRADOR_BARK2.get();
+        }
+
+        switch (this.rand.nextInt(4)) {
+
+            case 0:
+                return ModSoundEvents.LABRADOR_BARK2.get();
+
+            case 1:
+                return ModSoundEvents.LABRADOR_BARK_AMBIENT.get();
+
+            case 2:
+                return ModSoundEvents.LABRADOR_BREATHING.get();
+
+            default:
+                return ModSoundEvents.LABRADOR_PURR.get();
+        }
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
-        this.playSound(ModSoundEvents.LABRADOR_PURR.get(), 1.0F, 1.7F);
+        this.playSound(SoundEvents.ENTITY_WOLF_HURT, 1.0F, 1.7F);
         return null;
     }
 
     @Override
     protected SoundEvent getDeathSound() {
-        this.playSound(ModSoundEvents.LABRADOR_ANGRY.get(), 0.7F, 2.0F);
+        this.playSound(ModSoundEvents.LABRADOR_PURR.get(), 0.7F, 2.0F);
         return null;
     }
 
