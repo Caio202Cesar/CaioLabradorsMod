@@ -1,5 +1,6 @@
 package com.caiocesarmods.caiolabradorsmod.entity.custom;
 
+import com.caiocesarmods.caiolabradorsmod.Util.ModSoundEvents;
 import com.caiocesarmods.caiolabradorsmod.entity.LabradorVariant;
 import com.caiocesarmods.caiolabradorsmod.entity.ModEntityTypes;
 import net.minecraft.block.material.Material;
@@ -19,6 +20,9 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
@@ -50,9 +54,43 @@ public class LabradorEntity extends WolfEntity {
 
     public static AttributeModifierMap.MutableAttribute setCustomAttributes() {
         return MobEntity.func_233666_p_()
-                .createMutableAttribute(Attributes.MAX_HEALTH, 20.0D)
-                .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.2D);
+                .createMutableAttribute(Attributes.MAX_HEALTH, 24.0D)
+                .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.30D)
+                .createMutableAttribute(Attributes.ATTACK_DAMAGE, 4.0D)
+                .createMutableAttribute(Attributes.FOLLOW_RANGE, 32.0D);
     }
+
+    /*private byte geneB1;
+    private byte geneB2;
+
+    private byte geneE1;
+    private byte geneE2;
+
+    private boolean whiteGene;
+
+    public LabradorVariant calculateColor() {
+
+        if (whiteGene)
+            return LabradorVariant.WHITE;
+
+        boolean hasDominantB =
+                geneB1 == 1 || geneB2 == 1;
+
+        boolean hasDominantE =
+                geneE1 == 1 || geneE2 == 1;
+
+        if (!hasDominantE)
+            return LabradorVariant.YELLOW;
+
+        if (!hasDominantB)
+            return LabradorVariant.BROWN;
+
+        return LabradorVariant.BLACK;
+    }
+
+    public void updateVariant() {
+        this.setVariant(calculateColor());
+    }*/
 
     @Override
     public void writeAdditional(CompoundNBT compound) {
@@ -65,9 +103,13 @@ public class LabradorEntity extends WolfEntity {
         super.readAdditional(compound);
 
         if (compound.contains("Variant")) {
-            this.setVariant(
-                    LabradorVariant.values()[compound.getInt("Variant")]
-            );
+            int variant = compound.getInt("Variant");
+
+            if (variant >= 0 && variant < LabradorVariant.values().length) {
+                this.setVariant(LabradorVariant.values()[variant]);
+            } else {
+                this.setVariant(LabradorVariant.BROWN);
+            }
         }
     }
 
@@ -79,12 +121,26 @@ public class LabradorEntity extends WolfEntity {
             ILivingEntityData spawnData,
             CompoundNBT dataTag) {
 
-        this.setVariant(
-                LabradorVariant.values()[this.rand.nextInt(4)]
-        );
+        int roll = this.rand.nextInt(100);
+
+        if (roll < 50)
+            setVariant(LabradorVariant.YELLOW);
+
+        else if (roll < 80)
+            setVariant(LabradorVariant.BLACK);
+
+        else if (roll < 95)
+            setVariant(LabradorVariant.BROWN);
+
+        else
+            setVariant(LabradorVariant.WHITE);
 
         return super.onInitialSpawn(
-                world, difficulty, reason, spawnData, dataTag
+                world,
+                difficulty,
+                reason,
+                spawnData,
+                dataTag
         );
     }
 
@@ -112,12 +168,71 @@ public class LabradorEntity extends WolfEntity {
 
     @Override
     public boolean isBreedingItem(ItemStack stack) {
-        return stack.getItem() == Items.JUJUBA || stack.getItem() == Items.CARROT;
+        return stack.getItem() == Items.BONE || stack.getItem() == Items.COD
+                || stack.getItem() == Items.SALMON || stack.getItem() == Items.BEEF
+                || stack.getItem() == Items.BREAD || stack.getItem() == Items.MUTTON
+                || stack.getItem() == Items.CHICKEN || stack.getItem() == Items.APPLE;
     }
 
     @Override
-    public AgeableEntity createChild(ServerWorld world, AgeableEntity mate) {
-        return ModEntityTypes.LABRADOR_ENTITY.get().create(world);
+    public boolean canSwim() {
+        return true;
+    }
+
+    @Override
+    public WolfEntity createChild(ServerWorld world, AgeableEntity mate) {
+        LabradorEntity puppy = ModEntityTypes.LABRADOR_ENTITY.get().create(world);
+
+        if (puppy != null) {
+
+            LabradorVariant variant;
+
+            if (mate instanceof LabradorEntity) {
+                LabradorEntity other = (LabradorEntity) mate;
+
+                // 5% de chance de mutação
+                if (this.rand.nextFloat() < 0.05F) {
+
+                    variant = LabradorVariant.values()[
+                            this.rand.nextInt(LabradorVariant.values().length)
+                            ];
+
+                } else {
+
+                    // Herda a cor de um dos pais
+                    variant = this.rand.nextBoolean()
+                            ? this.getVariant()
+                            : other.getVariant();
+                }
+
+            } else {
+
+                variant = this.getVariant();
+
+            }
+
+            puppy.setVariant(variant);
+        }
+
+        return puppy;
+    }
+
+    @Override
+    public SoundEvent getAmbientSound() {
+        this.playSound(ModSoundEvents.LABRADOR_BARK2.get(), 0.7F, 1.0F);
+        return null;
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
+        this.playSound(ModSoundEvents.LABRADOR_PURR.get(), 1.0F, 1.7F);
+        return null;
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        this.playSound(ModSoundEvents.LABRADOR_ANGRY.get(), 0.7F, 2.0F);
+        return null;
     }
 
     @Override
@@ -135,7 +250,7 @@ public class LabradorEntity extends WolfEntity {
 
     @Override
     public int getMaxAir() {
-        return 600; // stays underwater longer
+        return 1200; // stays underwater longer
     }
 
 }
