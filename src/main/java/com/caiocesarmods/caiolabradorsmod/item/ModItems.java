@@ -15,7 +15,7 @@ public class ModItems {
             DeferredRegister.create(ForgeRegistries.ITEMS, CaioLabradorsMod.MOD_ID);
 
     public static final RegistryObject<ModSpawnEggItem> LABRADOR_SPAWN_EGG = ITEMS.register("labrador_spawn_egg",
-            () -> new ModSpawnEggItem(ModEntityTypes.LABRADOR_ENTITY, 0x342e28, 0x462e16,
+            () -> new ModSpawnEggItem(ModEntityTypes.LABRADOR_ENTITY, 0x462e16, 0x342e28,
                     new Item.Properties().group(ItemGroup.MISC)));
 
     public static void register(IEventBus eventBus) {

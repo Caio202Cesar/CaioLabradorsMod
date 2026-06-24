@@ -1,7 +1,10 @@
 package com.caiocesarmods.caiolabradorsmod.entity.custom;
 
-import com.google.common.collect.Maps;
-import net.minecraft.entity.EntityType;
+import com.caiocesarmods.caiolabradorsmod.entity.LabradorVariant;
+import com.caiocesarmods.caiolabradorsmod.entity.ModEntityTypes;
+import net.minecraft.entity.*;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.monster.AbstractSkeletonEntity;
 import net.minecraft.entity.passive.AnimalEntity;
@@ -9,27 +12,77 @@ import net.minecraft.entity.passive.TurtleEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.passive.horse.LlamaEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
-
-import java.util.Map;
+import net.minecraft.world.server.ServerWorld;
 
 public class LabradorEntity extends WolfEntity {
     private static final DataParameter<Integer> VARIANT =
             EntityDataManager.createKey(LabradorEntity.class, DataSerializers.VARINT);
-    public static final Map<Integer, ResourceLocation> TEXTURE_BY_ID = Util.make(Maps.newHashMap(), (p_213410_0_) -> {
-        p_213410_0_.put(0, new ResourceLocation("textures/entity/yellow_lab.png"));
-        p_213410_0_.put(1, new ResourceLocation("textures/entity/white_lab.png"));
-        p_213410_0_.put(2, new ResourceLocation("textures/entity/black_lab.png"));
-        p_213410_0_.put(3, new ResourceLocation("textures/entity/brown_lab.png"));
-    });
 
     public LabradorEntity(EntityType<? extends WolfEntity> type, World worldIn) {
         super(type, worldIn);
+    }
+
+    @Override
+    protected void registerData() {
+        super.registerData();
+        this.dataManager.register(VARIANT, 0);
+    }
+
+    public LabradorVariant getVariant() {
+        return LabradorVariant.values()[this.dataManager.get(VARIANT)];
+    }
+
+    public void setVariant(LabradorVariant variant) {
+        this.dataManager.set(VARIANT, variant.ordinal());
+    }
+
+    public static AttributeModifierMap.MutableAttribute setCustomAttributes() {
+        return MobEntity.func_233666_p_()
+                .createMutableAttribute(Attributes.MAX_HEALTH, 20.0D)
+                .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.2D);
+    }
+
+    @Override
+    public void writeAdditional(CompoundNBT compound) {
+        super.writeAdditional(compound);
+        compound.putInt("Variant", this.getVariant().ordinal());
+    }
+
+    @Override
+    public void readAdditional(CompoundNBT compound) {
+        super.readAdditional(compound);
+
+        if (compound.contains("Variant")) {
+            this.setVariant(
+                    LabradorVariant.values()[compound.getInt("Variant")]
+            );
+        }
+    }
+
+    @Override
+    public ILivingEntityData onInitialSpawn(
+            IServerWorld world,
+            DifficultyInstance difficulty,
+            SpawnReason reason,
+            ILivingEntityData spawnData,
+            CompoundNBT dataTag) {
+
+        this.setVariant(
+                LabradorVariant.values()[this.rand.nextInt(4)]
+        );
+
+        return super.onInitialSpawn(
+                world, difficulty, reason, spawnData, dataTag
+        );
     }
 
     protected void registerGoals() {
@@ -52,6 +105,16 @@ public class LabradorEntity extends WolfEntity {
         this.targetSelector.addGoal(6, new NonTamedTargetGoal<>(this, TurtleEntity.class, false, TurtleEntity.TARGET_DRY_BABY));
         this.targetSelector.addGoal(7, new NearestAttackableTargetGoal<>(this, AbstractSkeletonEntity.class, false));
         this.targetSelector.addGoal(8, new ResetAngerGoal<>(this, true));
+    }
+
+    @Override
+    public boolean isBreedingItem(ItemStack stack) {
+        return stack.getItem() == Items.JUJUBA || stack.getItem() == Items.CARROT;
+    }
+
+    @Override
+    public WolfEntity createChild(ServerWorld world, AgeableEntity mate) {
+        return ModEntityTypes.LABRADOR_ENTITY.get().create(world);
     }
 
 }
