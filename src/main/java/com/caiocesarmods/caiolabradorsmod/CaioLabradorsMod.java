@@ -2,6 +2,7 @@ package com.caiocesarmods.caiolabradorsmod;
 
 import com.caiocesarmods.caiolabradorsmod.Util.ModSoundEvents;
 import com.caiocesarmods.caiolabradorsmod.entity.ModEntityTypes;
+import com.caiocesarmods.caiolabradorsmod.entity.render.LabradorRenderer;
 import com.caiocesarmods.caiolabradorsmod.item.ModItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -10,6 +11,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -58,12 +60,13 @@ public class CaioLabradorsMod {
 
     private void doClientStuff(final FMLClientSetupEvent event) {
 
+        RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.LABRADOR_ENTITY.get(), LabradorRenderer::new);
     }
 
     private void enqueueIMC(final InterModEnqueueEvent event)
     {
         // some example code to dispatch IMC to another mod
-        InterModComms.sendTo("examplemod", "helloworld", () -> { LOGGER.info("Hello world from the MDK"); return "Hello world";});
+        InterModComms.sendTo("caiolabradorsmod", "helloworld", () -> { LOGGER.info("Hello world from the MDK"); return "Hello world";});
     }
 
     private void processIMC(final InterModProcessEvent event)

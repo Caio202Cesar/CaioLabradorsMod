@@ -2,6 +2,7 @@ package com.caiocesarmods.caiolabradorsmod.entity.custom;
 
 import com.caiocesarmods.caiolabradorsmod.entity.LabradorVariant;
 import com.caiocesarmods.caiolabradorsmod.entity.ModEntityTypes;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -18,8 +19,10 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
@@ -113,8 +116,26 @@ public class LabradorEntity extends WolfEntity {
     }
 
     @Override
-    public WolfEntity createChild(ServerWorld world, AgeableEntity mate) {
+    public AgeableEntity createChild(ServerWorld world, AgeableEntity mate) {
         return ModEntityTypes.LABRADOR_ENTITY.get().create(world);
+    }
+
+    @Override
+    public float getBlockPathWeight(BlockPos pos, IWorldReader worldIn) {
+        if (worldIn.getBlockState(pos).getMaterial() == Material.WATER) {
+            return 10.0F;
+        }
+        return super.getBlockPathWeight(pos, worldIn);
+    }
+
+    @Override
+    public boolean canBreatheUnderwater() {
+        return false; // keep realistic
+    }
+
+    @Override
+    public int getMaxAir() {
+        return 600; // stays underwater longer
     }
 
 }
