@@ -20,7 +20,7 @@ public class ModEntityGenerator {
     @SubscribeEvent
     public static void onEntitySpawn(final BiomeLoadingEvent event) {
         addEntityToAllOverworldBiomes(event, ModEntityTypes.LABRADOR_ENTITY.get(),
-                27, 2, 4);
+                12, 2, 4);
     }
 
     private static void addEntityToAllBiomesExceptThese(BiomeLoadingEvent event, EntityType<?> type,
