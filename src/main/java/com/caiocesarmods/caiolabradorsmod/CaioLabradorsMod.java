@@ -2,6 +2,7 @@ package com.caiocesarmods.caiolabradorsmod;
 
 import com.caiocesarmods.caiolabradorsmod.Util.ModSoundEvents;
 import com.caiocesarmods.caiolabradorsmod.entity.ModEntityTypes;
+import com.caiocesarmods.caiolabradorsmod.item.ModItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;
@@ -32,6 +33,8 @@ public class CaioLabradorsMod {
     public CaioLabradorsMod() {
 
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        ModItems.register(eventBus);
 
         ModEntityTypes.register(eventBus);
         ModSoundEvents.register(eventBus);

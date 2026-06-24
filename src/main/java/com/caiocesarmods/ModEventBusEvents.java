@@ -2,6 +2,8 @@ package com.caiocesarmods;
 
 import com.caiocesarmods.caiolabradorsmod.CaioLabradorsMod;
 import com.caiocesarmods.caiolabradorsmod.entity.ModEntityTypes;
+import com.caiocesarmods.caiolabradorsmod.entity.custom.LabradorEntity;
+import com.caiocesarmods.caiolabradorsmod.item.ModSpawnEggItem;
 import net.minecraft.entity.EntityType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
@@ -12,7 +14,7 @@ import net.minecraftforge.fml.common.Mod;
 public class ModEventBusEvents {
     @SubscribeEvent
     public static void addEntityAttributes(EntityAttributeCreationEvent event) {
-        event.put(ModEntityTypes.LABRADOR_ENTITY.get(), TocoToucanEntity.setCustomAttributes().create());
+        event.put(ModEntityTypes.LABRADOR_ENTITY.get(), LabradorEntity.setCustomAttributes().create());
 
     }
 
