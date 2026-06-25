@@ -174,14 +174,8 @@ public class LabradorEntity extends WolfEntity {
 
     @Override
     public boolean isBreedingItem(ItemStack stack) {
-        return stack.getItem() == Items.BONE || stack.getItem() == Items.COD
-                || stack.getItem() == Items.SALMON || stack.getItem() == Items.BEEF || stack.getItem() == Items.MUTTON
+        return stack.getItem() == Items.COD || stack.getItem() == Items.SALMON || stack.getItem() == Items.BEEF || stack.getItem() == Items.MUTTON
                 || stack.getItem() == Items.CHICKEN || stack.getItem() == Items.APPLE;
-    }
-
-    @Override
-    public boolean canBreed() {
-        return super.canBreed() && !this.isChild() && !this.isPassenger();
     }
 
     @Override

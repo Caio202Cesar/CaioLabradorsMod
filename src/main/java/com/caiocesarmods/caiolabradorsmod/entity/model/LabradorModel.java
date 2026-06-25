@@ -258,38 +258,6 @@ public class LabradorModel<T extends WolfEntity> extends WolfModel<T> {
                        float blue,
                        float alpha) {
 
-        if (this.isChild) {
-
-            // Cabeça
-
-            matrixStack.push();
-
-            matrixStack.scale(0.75F, 0.75F, 0.75F);
-            matrixStack.translate(0.0D, 0.5D, 0.0D);
-
-            head.render(matrixStack, buffer, packedLight, packedOverlay);
-
-            matrixStack.pop();
-
-            // Corpo
-
-            matrixStack.push();
-
-            matrixStack.scale(0.5F, 0.5F, 0.5F);
-            matrixStack.translate(0.0D, 1.5D, 0.0D);
-
-            mane.render(matrixStack, buffer, packedLight, packedOverlay);
-            body.render(matrixStack, buffer, packedLight, packedOverlay);
-            leg1.render(matrixStack, buffer, packedLight, packedOverlay);
-            leg2.render(matrixStack, buffer, packedLight, packedOverlay);
-            leg3.render(matrixStack, buffer, packedLight, packedOverlay);
-            leg4.render(matrixStack, buffer, packedLight, packedOverlay);
-            tail.render(matrixStack, buffer, packedLight, packedOverlay);
-
-            matrixStack.pop();
-
-        } else {
-
             head.render(matrixStack, buffer, packedLight, packedOverlay);
             mane.render(matrixStack, buffer, packedLight, packedOverlay);
             body.render(matrixStack, buffer, packedLight, packedOverlay);
@@ -298,6 +266,6 @@ public class LabradorModel<T extends WolfEntity> extends WolfModel<T> {
             leg3.render(matrixStack, buffer, packedLight, packedOverlay);
             leg4.render(matrixStack, buffer, packedLight, packedOverlay);
             tail.render(matrixStack, buffer, packedLight, packedOverlay);
-        }
+
     }
 }

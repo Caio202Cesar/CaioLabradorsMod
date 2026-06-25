@@ -3,6 +3,7 @@ package com.caiocesarmods.caiolabradorsmod.entity.render;
 import com.caiocesarmods.caiolabradorsmod.CaioLabradorsMod;
 import com.caiocesarmods.caiolabradorsmod.entity.custom.LabradorEntity;
 import com.caiocesarmods.caiolabradorsmod.entity.model.LabradorModel;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.util.ResourceLocation;
@@ -23,6 +24,20 @@ public class LabradorRenderer extends MobRenderer<LabradorEntity, LabradorModel<
         return entity.getVariant().getTexture();
     }
 
+    @Override
+    protected void preRenderCallback(LabradorEntity entity,
+                                     MatrixStack matrixStack,
+                                     float partialTickTime) {
+
+        if (entity.isChild()) {
+
+            matrixStack.scale(
+                    0.65F,
+                    0.65F,
+                    0.65F
+            );
+        }
+    }
 
     private static final ResourceLocation MY_DOG =
             new ResourceLocation(
