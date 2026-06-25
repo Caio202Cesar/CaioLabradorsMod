@@ -103,6 +103,7 @@ public class LabradorEntity extends WolfEntity {
 
         if (stack.getItem() == Items.BREAD
                 && this.getVariant() == LabradorVariant.BROWN
+                && isAdult()
                 && !this.isMyDog()) {
 
             this.setMyDog(true);
