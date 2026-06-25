@@ -28,8 +28,6 @@ import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
-import javax.annotation.OverridingMethodsMustInvokeSuper;
-
 public class LabradorEntity extends WolfEntity {
     private static final DataParameter<Integer> VARIANT =
             EntityDataManager.createKey(LabradorEntity.class, DataSerializers.VARINT);
@@ -156,7 +154,7 @@ public class LabradorEntity extends WolfEntity {
         this.goalSelector.addGoal(4, new LeapAtTargetGoal(this, 0.4F));
         this.goalSelector.addGoal(5, new MeleeAttackGoal(this, 1.0D, true));
         this.goalSelector.addGoal(6, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F, false));
-        this.goalSelector.addGoal(7, new FetchItemGoal(this));
+        //this.goalSelector.addGoal(7, new FetchItemGoal(this));
         this.goalSelector.addGoal(7, new BreedGoal(this, 1.0D));
         this.goalSelector.addGoal(8, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
         this.goalSelector.addGoal(9, new BegGoal(this, 8.0F));
@@ -174,8 +172,15 @@ public class LabradorEntity extends WolfEntity {
 
     @Override
     public boolean isBreedingItem(ItemStack stack) {
-        return stack.getItem() == Items.COD || stack.getItem() == Items.SALMON || stack.getItem() == Items.BEEF || stack.getItem() == Items.MUTTON
-                || stack.getItem() == Items.CHICKEN || stack.getItem() == Items.APPLE;
+
+        System.out.println("Breeding item: " + stack.getItem());
+
+        return stack.getItem() == Items.COD
+                || stack.getItem() == Items.SALMON
+                || stack.getItem() == Items.BEEF
+                || stack.getItem() == Items.MUTTON
+                || stack.getItem() == Items.CHICKEN
+                || stack.getItem() == Items.APPLE;
     }
 
     @Override
