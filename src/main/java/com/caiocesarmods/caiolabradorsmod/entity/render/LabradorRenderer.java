@@ -16,21 +16,13 @@ public class LabradorRenderer extends MobRenderer<LabradorEntity, LabradorModel<
     @Override
     public ResourceLocation getEntityTexture(LabradorEntity entity) {
         if (entity.isMyDog()) {
+            this.addLayer(new MaxCollarLayer(this));
             return MY_DOG;
         }
 
         return entity.getVariant().getTexture();
     }
 
-    @Override
-    public ResourceLocation getEntityTexture(LabradorEntity entity) {
-
-        if (entity.isMyDog()) {
-            return MY_DOG_TEXTURE;
-        }
-
-        return entity.getVariant().getTexture();
-    }
 
     private static final ResourceLocation MY_DOG =
             new ResourceLocation(
