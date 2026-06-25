@@ -20,9 +20,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
@@ -30,9 +28,13 @@ import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
+import javax.annotation.OverridingMethodsMustInvokeSuper;
+
 public class LabradorEntity extends WolfEntity {
     private static final DataParameter<Integer> VARIANT =
             EntityDataManager.createKey(LabradorEntity.class, DataSerializers.VARINT);
+    private static final DataParameter<Boolean> IS_MY_DOG =
+            EntityDataManager.createKey(LabradorEntity.class, DataSerializers.BOOLEAN);
 
     public LabradorEntity(EntityType<? extends WolfEntity> type, World worldIn) {
         super(type, worldIn);
@@ -42,6 +44,15 @@ public class LabradorEntity extends WolfEntity {
     protected void registerData() {
         super.registerData();
         this.dataManager.register(VARIANT, 0);
+        this.dataManager.register(IS_MY_DOG, false);
+    }
+
+    public boolean isMyDog() {
+        return this.dataManager.get(IS_MY_DOG);
+    }
+
+    public void setMyDog(boolean value) {
+        this.dataManager.set(IS_MY_DOG, value);
     }
 
     public LabradorVariant getVariant() {
@@ -64,11 +75,14 @@ public class LabradorEntity extends WolfEntity {
     public void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
         compound.putInt("Variant", this.getVariant().ordinal());
+
+        compound.putBoolean("MyDog", this.isMyDog());
     }
 
     @Override
     public void readAdditional(CompoundNBT compound) {
         super.readAdditional(compound);
+        this.setMyDog(compound.getBoolean("MyDog"));
 
         if (compound.contains("Variant")) {
             int variant = compound.getInt("Variant");
@@ -79,6 +93,28 @@ public class LabradorEntity extends WolfEntity {
                 this.setVariant(LabradorVariant.BROWN);
             }
         }
+    }
+
+    @Override
+    public ActionResultType getEntityInteractionResult(PlayerEntity player,
+                                                       Hand hand) {
+
+        ItemStack stack = player.getHeldItem(hand);
+
+        if (stack.getItem() == Items.BREAD
+                && this.getVariant() == LabradorVariant.BROWN
+                && !this.isMyDog()) {
+
+            this.setMyDog(true);
+
+            if (!player.abilities.isCreativeMode) {
+                stack.shrink(1);
+            }
+
+            return ActionResultType.SUCCESS;
+        }
+
+        return super.getEntityInteractionResult(player, hand);
     }
 
     @Override
@@ -241,5 +277,6 @@ public class LabradorEntity extends WolfEntity {
     public int getMaxAir() {
         return 1200; // stays underwater longer
     }
+
 
 }

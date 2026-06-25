@@ -15,6 +15,15 @@ public class LabradorRenderer extends MobRenderer<LabradorEntity, LabradorModel<
 
     @Override
     public ResourceLocation getEntityTexture(LabradorEntity entity) {
+        if (entity.isMyDog()) {
+            return MY_DOG;
+        }
+
         return entity.getVariant().getTexture();
     }
+
+    private static final ResourceLocation MY_DOG =
+            new ResourceLocation(
+                    CaioLabradorsMod.MOD_ID,
+                    "textures/entity/my_dog.png");
 }
