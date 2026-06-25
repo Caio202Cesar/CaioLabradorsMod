@@ -20,6 +20,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.DifficultyInstance;
@@ -105,6 +106,32 @@ public class LabradorEntity extends WolfEntity {
                 && !this.isMyDog()) {
 
             this.setMyDog(true);
+
+            if (!this.world.isRemote) {
+
+                this.world.playSound(
+                        null,
+                        this.getPosX(),
+                        this.getPosY(),
+                        this.getPosZ(),
+                        ModSoundEvents.LABRADOR_ANGRY.get(),
+                        this.getSoundCategory(),
+                        1.0F,
+                        1.0F
+                );
+
+                ((ServerWorld) this.world).spawnParticle(
+                        ParticleTypes.HEART,
+                        this.getPosX(),
+                        this.getPosYEye(),
+                        this.getPosZ(),
+                        10,     // Number of particles
+                        0.4D,   // X spread
+                        0.4D,   // Y spread
+                        0.4D,   // Z spread
+                        0.02D   // Speed
+                );
+            }
 
             if (!player.abilities.isCreativeMode) {
                 stack.shrink(1);
