@@ -120,17 +120,15 @@ public class LabradorEntity extends WolfEntity {
                         1.0F
                 );
 
-                ((ServerWorld) this.world).spawnParticle(
-                        ParticleTypes.HEART,
-                        this.getPosX(),
-                        this.getPosYEye(),
-                        this.getPosZ(),
-                        10,     // Number of particles
-                        0.4D,   // X spread
-                        0.4D,   // Y spread
-                        0.4D,   // Z spread
-                        0.02D   // Speed
-                );
+                ServerWorld server = (ServerWorld) this.world;
+
+                server.spawnParticle(ParticleTypes.HEART,
+                        getPosX(), getPosYEye(), getPosZ(),
+                        8, 0.4, 0.4, 0.4, 0.02);
+
+                server.spawnParticle(ParticleTypes.FIREWORK,
+                        getPosX(), getPosYEye(), getPosZ(),
+                        15, 0.5, 0.5, 0.5, 0.05);
             }
 
             if (!player.abilities.isCreativeMode) {
@@ -183,6 +181,7 @@ public class LabradorEntity extends WolfEntity {
         this.goalSelector.addGoal(6, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F, true));
         //this.goalSelector.addGoal(7, new FetchItemGoal(this));
         this.goalSelector.addGoal(7, new BreedGoal(this, 1.0D));
+        this.goalSelector.addGoal(8, new FollowPackLeaderGoal(this));
         this.goalSelector.addGoal(8, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
         this.goalSelector.addGoal(9, new BegGoal(this, 8.0F));
         this.goalSelector.addGoal(10, new LookAtGoal(this, PlayerEntity.class, 8.0F));
@@ -197,7 +196,7 @@ public class LabradorEntity extends WolfEntity {
         this.targetSelector.addGoal(8, new ResetAngerGoal<>(this, true));
     }
 
-    @Override
+    /*@Override
     public boolean isBreedingItem(ItemStack stack) {
 
         System.out.println("Breeding item: " + stack.getItem());
@@ -208,7 +207,7 @@ public class LabradorEntity extends WolfEntity {
                 || stack.getItem() == Items.MUTTON
                 || stack.getItem() == Items.CHICKEN
                 || stack.getItem() == Items.APPLE;
-    }
+    }*/
 
     @Override
     public boolean canSwim() {
