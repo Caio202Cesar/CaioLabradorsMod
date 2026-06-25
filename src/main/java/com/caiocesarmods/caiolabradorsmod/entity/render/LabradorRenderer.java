@@ -10,14 +10,22 @@ import net.minecraft.util.ResourceLocation;
 
 public class LabradorRenderer extends MobRenderer<LabradorEntity, LabradorModel<LabradorEntity>> {
 
+    private static final ResourceLocation MY_DOG =
+            new ResourceLocation(
+                    CaioLabradorsMod.MOD_ID,
+                    "textures/entity/my_dog.png");
+
     public LabradorRenderer(EntityRendererManager renderManagerIn) {
         super(renderManagerIn, new LabradorModel<>(), 0.7F);
+
+        // Add the collar layer only once.
+        this.addLayer(new MaxCollarLayer(this));
     }
 
     @Override
     public ResourceLocation getEntityTexture(LabradorEntity entity) {
+
         if (entity.isMyDog()) {
-            this.addLayer(new MaxCollarLayer(this));
             return MY_DOG;
         }
 
@@ -30,17 +38,7 @@ public class LabradorRenderer extends MobRenderer<LabradorEntity, LabradorModel<
                                      float partialTickTime) {
 
         if (entity.isChild()) {
-
-            matrixStack.scale(
-                    0.65F,
-                    0.65F,
-                    0.65F
-            );
+            matrixStack.scale(0.65F, 0.65F, 0.65F);
         }
     }
-
-    private static final ResourceLocation MY_DOG =
-            new ResourceLocation(
-                    CaioLabradorsMod.MOD_ID,
-                    "textures/entity/my_dog.png");
 }

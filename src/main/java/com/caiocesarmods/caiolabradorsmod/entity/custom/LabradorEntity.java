@@ -24,6 +24,8 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.IWorldReader;
@@ -35,6 +37,8 @@ import java.util.UUID;
 public class LabradorEntity extends WolfEntity {
     private static final DataParameter<Integer> VARIANT =
             EntityDataManager.createKey(LabradorEntity.class, DataSerializers.VARINT);
+    private static final DataParameter<Boolean> IS_MY_DOG =
+            EntityDataManager.createKey(LabradorEntity.class, DataSerializers.BOOLEAN);
 
     public LabradorEntity(EntityType<? extends WolfEntity> type, World worldIn) {
         super(type, worldIn);
@@ -44,11 +48,16 @@ public class LabradorEntity extends WolfEntity {
     protected void registerData() {
         super.registerData();
         this.dataManager.register(VARIANT, 0);
+        this.dataManager.register(IS_MY_DOG, false);
+
     }
 
     public boolean isMyDog() {
-        LabradorWorldData data = getWorldData();
-        return data != null && this.getUniqueID().equals(data.getMyDogUUID());
+        return this.dataManager.get(IS_MY_DOG);
+    }
+
+    public void setMyDog(boolean value) {
+        this.dataManager.set(IS_MY_DOG, value);
     }
 
     public LabradorVariant getVariant() {
@@ -75,6 +84,24 @@ public class LabradorEntity extends WolfEntity {
     }
 
     @Override
+    public void onAddedToWorld() {
+
+        super.onAddedToWorld();
+
+        if (!world.isRemote) {
+
+            LabradorWorldData data = getWorldData();
+
+            if (data != null) {
+
+                this.setMyDog(
+                        this.getUniqueID().equals(data.getMyDogUUID())
+                );
+            }
+        }
+    }
+
+    @Override
     public void readAdditional(CompoundNBT compound) {
         super.readAdditional(compound);
 
@@ -87,13 +114,25 @@ public class LabradorEntity extends WolfEntity {
                 this.setVariant(LabradorVariant.BROWN);
             }
         }
+
+        if (this.isMyDog()) {
+            this.setCustomName(
+                    new StringTextComponent("Max")
+                            .mergeStyle(TextFormatting.GOLD)
+            );
+            this.setCustomNameVisible(true);
+        }
     }
 
     @Override
-    public ActionResultType getEntityInteractionResult(PlayerEntity player,
-                                                       Hand hand) {
+    public ActionResultType getEntityInteractionResult(PlayerEntity player, Hand hand) {
 
         ItemStack stack = player.getHeldItem(hand);
+
+        // Prevent renaming Max
+        if (this.isMyDog() && stack.getItem() == Items.NAME_TAG) {
+            return ActionResultType.SUCCESS;
+        }
 
         if (stack.getItem() == Items.BREAD
                 && this.getVariant() == LabradorVariant.BROWN
@@ -106,6 +145,15 @@ public class LabradorEntity extends WolfEntity {
             if (data != null) {
                 data.setMyDogUUID(this.getUniqueID());
             }
+
+            this.setMyDog(true);
+
+            this.setCustomName(
+                    new StringTextComponent("Max")
+                            .mergeStyle(TextFormatting.GOLD)
+            );
+
+            this.setCustomNameVisible(true);
 
             if (!this.world.isRemote) {
 
@@ -208,10 +256,8 @@ public class LabradorEntity extends WolfEntity {
 
         LabradorWorldData data = getWorldData();
 
-        if (data == null)
-            return false;
-
-        return data.getMyDogUUID() == null;
+        return data != null
+                && data.getMyDogUUID() == null;
     }
 
     /*@Override
@@ -239,9 +285,8 @@ public class LabradorEntity extends WolfEntity {
 
             LabradorWorldData data = getWorldData();
 
-            if (data != null) {
+            if (data != null)
                 data.clearMyDogUUID();
-            }
         }
 
         super.onDeath(source);
