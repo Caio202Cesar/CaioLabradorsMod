@@ -93,10 +93,8 @@ public class LabradorModel<T extends WolfEntity> extends WolfModel<T> {
 
         tail = new ModelRenderer(this);
         tail.setRotationPoint(-1.0F, 12.0F, 10.0F);
-        tail.setTextureOffset(9, 18)
-                .addBox(0.0F, 0.0F, -1.0F,
-                        2.0F, 10.0F, 2.0F,
-                        0.0F);
+        tail.setTextureOffset(11, 20)
+                .addBox(0.5F, 0.0F, -1.0F, 1.0F, 10.0F, 1.0F);
     }
 
     private float animationTime;
