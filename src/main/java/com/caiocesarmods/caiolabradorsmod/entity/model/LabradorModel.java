@@ -25,25 +25,17 @@ public class LabradorModel<T extends WolfEntity> extends WolfModel<T> {
         head = new ModelRenderer(this);
         head.setRotationPoint(-1.0F, 13.5F, -7.0F);
 
-        head.setTextureOffset(-2, -2)
-                .addBox(-2.0F, -3.0F, -4.0F,
-                        6.0F, 6.0F, 6.0F,
-                        0.0F);
+        head.setTextureOffset(0, 0)
+                .addBox(-2.0F, -3.0F, -4.0F, 6.0F, 6.0F, 6.0F);
 
         head.setTextureOffset(1, 11)
-                .addBox(-0.5F, -0.02F, -7.0F,
-                        3.0F, 3.0F, 3.0F,
-                        0.0F);
+                .addBox(-0.5F, -0.02F, -7.0F, 3.0F, 3.0F, 3.0F);
 
         head.setTextureOffset(47, 18)
-                .addBox(-3.0F, -2.0F, -2.0F,
-                        1.0F, 4.0F, 3.0F,
-                        0.0F);
+                .addBox(-3.0F, -2.0F, -2.0F, 1.0F, 4.0F, 3.0F);
 
         head.setTextureOffset(47, 25)
-                .addBox(4.0F, -2.0F, -2.0F,
-                        1.0F, 4.0F, 3.0F,
-                        0.0F);
+                .addBox(4.0F, -2.0F, -2.0F, 1.0F, 4.0F, 3.0F);
 
         mane = new ModelRenderer(this);
         mane.setRotationPoint(-1.0F, 14.0F, -3.0F);
