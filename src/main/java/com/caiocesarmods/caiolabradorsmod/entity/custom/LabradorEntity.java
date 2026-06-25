@@ -2,6 +2,7 @@ package com.caiocesarmods.caiolabradorsmod.entity.custom;
 
 import com.caiocesarmods.caiolabradorsmod.Util.ModSoundEvents;
 import com.caiocesarmods.caiolabradorsmod.entity.LabradorVariant;
+import com.caiocesarmods.caiolabradorsmod.entity.LabradorWorldData;
 import com.caiocesarmods.caiolabradorsmod.entity.ModEntityTypes;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.*;
@@ -29,11 +30,11 @@ import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
+import java.util.UUID;
+
 public class LabradorEntity extends WolfEntity {
     private static final DataParameter<Integer> VARIANT =
             EntityDataManager.createKey(LabradorEntity.class, DataSerializers.VARINT);
-    private static final DataParameter<Boolean> IS_MY_DOG =
-            EntityDataManager.createKey(LabradorEntity.class, DataSerializers.BOOLEAN);
 
     public LabradorEntity(EntityType<? extends WolfEntity> type, World worldIn) {
         super(type, worldIn);
@@ -43,15 +44,11 @@ public class LabradorEntity extends WolfEntity {
     protected void registerData() {
         super.registerData();
         this.dataManager.register(VARIANT, 0);
-        this.dataManager.register(IS_MY_DOG, false);
     }
 
     public boolean isMyDog() {
-        return this.dataManager.get(IS_MY_DOG);
-    }
-
-    public void setMyDog(boolean value) {
-        this.dataManager.set(IS_MY_DOG, value);
+        LabradorWorldData data = getWorldData();
+        return data != null && this.getUniqueID().equals(data.getMyDogUUID());
     }
 
     public LabradorVariant getVariant() {
@@ -75,13 +72,11 @@ public class LabradorEntity extends WolfEntity {
         super.writeAdditional(compound);
         compound.putInt("Variant", this.getVariant().ordinal());
 
-        compound.putBoolean("MyDog", this.isMyDog());
     }
 
     @Override
     public void readAdditional(CompoundNBT compound) {
         super.readAdditional(compound);
-        this.setMyDog(compound.getBoolean("MyDog"));
 
         if (compound.contains("Variant")) {
             int variant = compound.getInt("Variant");
@@ -103,9 +98,14 @@ public class LabradorEntity extends WolfEntity {
         if (stack.getItem() == Items.BREAD
                 && this.getVariant() == LabradorVariant.BROWN
                 && isAdult()
-                && !this.isMyDog()) {
+                && !this.isMyDog()
+                && this.canBecomeMyDog()) {
 
-            this.setMyDog(true);
+            LabradorWorldData data = getWorldData();
+
+            if (data != null) {
+                data.setMyDogUUID(this.getUniqueID());
+            }
 
             if (!this.world.isRemote) {
 
@@ -196,6 +196,24 @@ public class LabradorEntity extends WolfEntity {
         this.targetSelector.addGoal(8, new ResetAngerGoal<>(this, true));
     }
 
+    private LabradorWorldData getWorldData() {
+
+        if (!(world instanceof ServerWorld))
+            return null;
+
+        return LabradorWorldData.get((ServerWorld) world);
+    }
+
+    public boolean canBecomeMyDog() {
+
+        LabradorWorldData data = getWorldData();
+
+        if (data == null)
+            return false;
+
+        return data.getMyDogUUID() == null;
+    }
+
     /*@Override
     public boolean isBreedingItem(ItemStack stack) {
 
@@ -212,6 +230,21 @@ public class LabradorEntity extends WolfEntity {
     @Override
     public boolean canSwim() {
         return true;
+    }
+
+    @Override
+    public void onDeath(DamageSource source) {
+
+        if (!world.isRemote && this.isMyDog()) {
+
+            LabradorWorldData data = getWorldData();
+
+            if (data != null) {
+                data.clearMyDogUUID();
+            }
+        }
+
+        super.onDeath(source);
     }
 
     @Override
@@ -307,6 +340,4 @@ public class LabradorEntity extends WolfEntity {
     public int getMaxAir() {
         return 1200; // stays underwater longer
     }
-
-
 }
