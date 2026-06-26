@@ -42,6 +42,7 @@ public class LabradorEntity extends WolfEntity {
 
     public LabradorEntity(EntityType<? extends WolfEntity> type, World worldIn) {
         super(type, worldIn);
+        this.setTamed(false);
     }
 
     @Override
@@ -81,6 +82,58 @@ public class LabradorEntity extends WolfEntity {
         super.writeAdditional(compound);
         compound.putInt("Variant", this.getVariant().ordinal());
 
+    }
+
+    public void setTamed(boolean tamed) {
+        super.setTamed(tamed);
+        if (tamed) {
+            this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(40.0D);
+            this.setHealth(40.0F);
+        } else {
+            this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(24.0D);
+        }
+    }
+
+    protected void registerGoals() {
+        this.goalSelector.addGoal(1, new SwimGoal(this));
+        this.goalSelector.addGoal(2, new SitGoal(this));
+        this.goalSelector.addGoal(3, new AvoidEntityGoal<>(this, LlamaEntity.class, 24.0F, 1.5D, 1.5D));
+        this.goalSelector.addGoal(4, new LeapAtTargetGoal(this, 0.4F));
+        this.goalSelector.addGoal(5, new MeleeAttackGoal(this, 1.0D, true));
+        this.goalSelector.addGoal(6, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F, true));
+        //this.goalSelector.addGoal(7, new FetchItemGoal(this));
+        this.goalSelector.addGoal(7, new BreedGoal(this, 1.0D));
+        this.goalSelector.addGoal(8, new FollowPackLeaderGoal(this));
+        this.goalSelector.addGoal(8, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
+        this.goalSelector.addGoal(9, new BegGoal(this, 8.0F));
+        this.goalSelector.addGoal(10, new LookAtGoal(this, PlayerEntity.class, 8.0F));
+        this.goalSelector.addGoal(10, new LookRandomlyGoal(this));
+        this.targetSelector.addGoal(1, new OwnerHurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new OwnerHurtTargetGoal(this));
+        this.targetSelector.addGoal(3, (new HurtByTargetGoal(this)).setCallsForHelp());
+        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, PlayerEntity.class, 10, true, false, this::func_233680_b_));
+        this.targetSelector.addGoal(5, new NonTamedTargetGoal<>(this, AnimalEntity.class, false, TARGET_ENTITIES));
+        this.targetSelector.addGoal(6, new NonTamedTargetGoal<>(this, TurtleEntity.class, false, TurtleEntity.TARGET_DRY_BABY));
+        this.targetSelector.addGoal(7, new NearestAttackableTargetGoal<>(this, AbstractSkeletonEntity.class, false));
+        this.targetSelector.addGoal(8, new ResetAngerGoal<>(this, true));
+    }
+
+    @Override
+    public boolean canMateWith(AnimalEntity other) {
+
+        if (other == this)
+            return false;
+
+        if (!(other instanceof LabradorEntity))
+            return false;
+
+        LabradorEntity dog = (LabradorEntity) other;
+
+        return this.isTamed()
+                && dog.isTamed()
+                && this.isInLove()
+                && !isMyDog()
+                && dog.isInLove();
     }
 
     @Override
@@ -186,7 +239,42 @@ public class LabradorEntity extends WolfEntity {
             return ActionResultType.SUCCESS;
         }
 
+        if (stack.getItem() == Items.COD
+                || stack.getItem() == Items.SALMON
+                || stack.getItem() == Items.BEEF
+                || stack.getItem() == Items.MUTTON
+                || stack.getItem() == Items.CHICKEN
+                || stack.getItem() == Items.APPLE) {
+
+            if (!this.world.isRemote) {
+                if (this.rand.nextInt(3) == 0) {
+                    this.setTamedBy(player);
+                    this.world.setEntityState(this, (byte)7);
+                } else {
+                    this.world.setEntityState(this, (byte)6);
+                }
+            }
+
+            if (!player.abilities.isCreativeMode) {
+                stack.shrink(1);
+            }
+
+            return ActionResultType.SUCCESS;
+        }
+
         return super.getEntityInteractionResult(player, hand);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (!this.world.isRemote && this.ticksExisted % 40 == 0) {
+            System.out.println("----------------");
+            System.out.println("Tamed: " + this.isTamed());
+            System.out.println("Owner: " + this.getOwnerId());
+            System.out.println("Sitting: " + this.isQueuedToSit());
+        }
     }
 
     @Override
@@ -220,30 +308,6 @@ public class LabradorEntity extends WolfEntity {
         );
     }
 
-    protected void registerGoals() {
-        this.goalSelector.addGoal(1, new SwimGoal(this));
-        this.goalSelector.addGoal(2, new SitGoal(this));
-        this.goalSelector.addGoal(3, new AvoidEntityGoal<>(this, LlamaEntity.class, 24.0F, 1.5D, 1.5D));
-        this.goalSelector.addGoal(4, new LeapAtTargetGoal(this, 0.4F));
-        this.goalSelector.addGoal(5, new MeleeAttackGoal(this, 1.0D, true));
-        this.goalSelector.addGoal(6, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F, true));
-        //this.goalSelector.addGoal(7, new FetchItemGoal(this));
-        this.goalSelector.addGoal(7, new BreedGoal(this, 1.0D));
-        this.goalSelector.addGoal(8, new FollowPackLeaderGoal(this));
-        this.goalSelector.addGoal(8, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
-        this.goalSelector.addGoal(9, new BegGoal(this, 8.0F));
-        this.goalSelector.addGoal(10, new LookAtGoal(this, PlayerEntity.class, 8.0F));
-        this.goalSelector.addGoal(10, new LookRandomlyGoal(this));
-        this.targetSelector.addGoal(1, new OwnerHurtByTargetGoal(this));
-        this.targetSelector.addGoal(2, new OwnerHurtTargetGoal(this));
-        this.targetSelector.addGoal(3, (new HurtByTargetGoal(this)).setCallsForHelp());
-        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, PlayerEntity.class, 10, true, false, this::func_233680_b_));
-        this.targetSelector.addGoal(5, new NonTamedTargetGoal<>(this, AnimalEntity.class, false, TARGET_ENTITIES));
-        this.targetSelector.addGoal(6, new NonTamedTargetGoal<>(this, TurtleEntity.class, false, TurtleEntity.TARGET_DRY_BABY));
-        this.targetSelector.addGoal(7, new NearestAttackableTargetGoal<>(this, AbstractSkeletonEntity.class, false));
-        this.targetSelector.addGoal(8, new ResetAngerGoal<>(this, true));
-    }
-
     private LabradorWorldData getWorldData() {
 
         if (!(world instanceof ServerWorld))
@@ -260,7 +324,7 @@ public class LabradorEntity extends WolfEntity {
                 && data.getMyDogUUID() == null;
     }
 
-    /*@Override
+    @Override
     public boolean isBreedingItem(ItemStack stack) {
 
         System.out.println("Breeding item: " + stack.getItem());
@@ -271,7 +335,7 @@ public class LabradorEntity extends WolfEntity {
                 || stack.getItem() == Items.MUTTON
                 || stack.getItem() == Items.CHICKEN
                 || stack.getItem() == Items.APPLE;
-    }*/
+    }
 
     @Override
     public boolean canSwim() {
