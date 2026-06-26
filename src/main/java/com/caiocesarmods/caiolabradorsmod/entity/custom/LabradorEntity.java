@@ -4,15 +4,18 @@ import com.caiocesarmods.caiolabradorsmod.Util.ModSoundEvents;
 import com.caiocesarmods.caiolabradorsmod.entity.LabradorVariant;
 import com.caiocesarmods.caiolabradorsmod.entity.LabradorWorldData;
 import com.caiocesarmods.caiolabradorsmod.entity.ModEntityTypes;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.monster.AbstractSkeletonEntity;
+import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.TurtleEntity;
 import net.minecraft.entity.passive.WolfEntity;
+import net.minecraft.entity.passive.fish.AbstractFishEntity;
 import net.minecraft.entity.passive.horse.LlamaEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -94,14 +97,17 @@ public class LabradorEntity extends WolfEntity {
         }
     }
 
+    @Override
     protected void registerGoals() {
+        super.registerGoals();
+
         this.goalSelector.addGoal(1, new SwimGoal(this));
         this.goalSelector.addGoal(2, new SitGoal(this));
         this.goalSelector.addGoal(3, new AvoidEntityGoal<>(this, LlamaEntity.class, 24.0F, 1.5D, 1.5D));
         this.goalSelector.addGoal(4, new LeapAtTargetGoal(this, 0.4F));
         this.goalSelector.addGoal(5, new MeleeAttackGoal(this, 1.0D, true));
         this.goalSelector.addGoal(6, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F, true));
-        //this.goalSelector.addGoal(7, new FetchItemGoal(this));
+        this.goalSelector.addGoal(7, new FetchItemGoal(this));
         this.goalSelector.addGoal(7, new BreedGoal(this, 1.0D));
         this.goalSelector.addGoal(8, new FollowPackLeaderGoal(this));
         this.goalSelector.addGoal(8, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
@@ -115,6 +121,8 @@ public class LabradorEntity extends WolfEntity {
         this.targetSelector.addGoal(5, new NonTamedTargetGoal<>(this, AnimalEntity.class, false, TARGET_ENTITIES));
         this.targetSelector.addGoal(6, new NonTamedTargetGoal<>(this, TurtleEntity.class, false, TurtleEntity.TARGET_DRY_BABY));
         this.targetSelector.addGoal(7, new NearestAttackableTargetGoal<>(this, AbstractSkeletonEntity.class, false));
+        this.targetSelector.addGoal(7, new NearestAttackableTargetGoal<>(this, AbstractFishEntity.class, false));
+        this.targetSelector.addGoal(7, new NearestAttackableTargetGoal<>(this, MonsterEntity.class, false));
         this.targetSelector.addGoal(8, new ResetAngerGoal<>(this, true));
     }
 
@@ -131,8 +139,10 @@ public class LabradorEntity extends WolfEntity {
 
         return this.isTamed()
                 && dog.isTamed()
-                && this.isInLove()
+                && !this.isQueuedToSit()
+                && !dog.isQueuedToSit()
                 && !isMyDog()
+                && this.isInLove()
                 && dog.isInLove();
     }
 
@@ -239,6 +249,8 @@ public class LabradorEntity extends WolfEntity {
             return ActionResultType.SUCCESS;
         }
 
+        System.out.println(this.isInLove());
+
         if (stack.getItem() == Items.COD
                 || stack.getItem() == Items.SALMON
                 || stack.getItem() == Items.BEEF
@@ -274,6 +286,8 @@ public class LabradorEntity extends WolfEntity {
             System.out.println("Tamed: " + this.isTamed());
             System.out.println("Owner: " + this.getOwnerId());
             System.out.println("Sitting: " + this.isQueuedToSit());
+            System.out.println("In love: " + this.isInLove());
+
         }
     }
 
@@ -357,7 +371,9 @@ public class LabradorEntity extends WolfEntity {
     }
 
     @Override
-    public WolfEntity createChild(ServerWorld world, AgeableEntity mate) {
+    public LabradorEntity createChild(ServerWorld world, AgeableEntity mate) {
+        System.out.println("Labrador createChild() called!");
+
         LabradorEntity puppy = ModEntityTypes.LABRADOR_ENTITY.get().create(world);
 
         if (puppy != null) {
@@ -418,6 +434,10 @@ public class LabradorEntity extends WolfEntity {
             default:
                 return ModSoundEvents.LABRADOR_PURR.get();
         }
+    }
+
+    protected void playStepSound(BlockPos pos, BlockState blockIn) {
+        this.playSound(SoundEvents.ENTITY_WOLF_STEP, 0.15F, 1.0F);
     }
 
     @Override
