@@ -18,6 +18,7 @@ import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.passive.fish.AbstractFishEntity;
 import net.minecraft.entity.passive.horse.LlamaEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
@@ -25,6 +26,8 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
@@ -280,6 +283,19 @@ public class LabradorEntity extends WolfEntity {
             return ActionResultType.SUCCESS;
         }
 
+        if (stack.getItem() == DEADLY_ITEM) {
+            if (!player.abilities.isCreativeMode) {
+                stack.shrink(1);
+            }
+
+            this.addPotionEffect(new EffectInstance(Effects.POISON, 900));
+            if (player.isCreative() || !this.isInvulnerable()) {
+                this.attackEntityFrom(DamageSource.causePlayerDamage(player), Float.MAX_VALUE);
+            }
+
+            return ActionResultType.func_233537_a_(this.world.isRemote);
+        }
+
         return super.getEntityInteractionResult(player, hand);
     }
 
@@ -362,6 +378,8 @@ public class LabradorEntity extends WolfEntity {
                 || stack.getItem() == Items.GOLDEN_APPLE
                 || stack.getItem() == Items.MELON_SLICE;
     }
+
+    private static final Item DEADLY_ITEM = Items.COOKIE;
 
     @Override
     public boolean canSwim() {
