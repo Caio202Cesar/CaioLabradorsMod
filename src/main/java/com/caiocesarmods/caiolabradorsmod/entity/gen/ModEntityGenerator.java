@@ -19,7 +19,7 @@ public class ModEntityGenerator {
 
     @SubscribeEvent
     public static void onEntitySpawn(final BiomeLoadingEvent event) {
-        addEntityToAllOverworldBiomes(event, ModEntityTypes.LABRADOR_ENTITY.get(),
+        addEntityToAllOverworldBiomesExceptThese(event, ModEntityTypes.LABRADOR_ENTITY.get(),
                 12, 2, 4);
 
     }
@@ -32,6 +32,16 @@ public class ModEntityGenerator {
 
         if(!isBiomeSelected) {
             addEntityToAllBiomes(event, type, weight, minCount, maxCount);
+        }
+    }
+
+    private static void addEntityToAllOverworldBiomesExceptThese(BiomeLoadingEvent event, EntityType<?> type,
+                                                        int weight, int minCount, int maxCount) {
+
+        if(!event.getCategory().equals(Biome.Category.THEEND) && !event.getCategory().equals(Biome.Category.NETHER)
+                && !event.getCategory().equals(Biome.Category.OCEAN)) {
+            List<MobSpawnInfo.Spawners> base = event.getSpawns().getSpawner(type.getClassification());
+            base.add(new MobSpawnInfo.Spawners(type,weight, minCount, maxCount));
         }
     }
 
