@@ -199,7 +199,7 @@ public class LabradorEntity extends WolfEntity {
             return ActionResultType.SUCCESS;
         }
 
-        if (!this.isTamed() && (stack.getItem() == Items.BREAD
+        if ((stack.getItem() == Items.BREAD
                 && this.getVariant() == LabradorVariant.BROWN
                 && isAdult()
                 && !this.isMyDog()
@@ -253,7 +253,7 @@ public class LabradorEntity extends WolfEntity {
 
         System.out.println(this.isInLove());
 
-        if (stack.getItem() == Items.COD
+        if (!this.isTamed() && stack.getItem() == Items.COD
                 || stack.getItem() == Items.SALMON
                 || stack.getItem() == Items.BEEF
                 || stack.getItem() == Items.MUTTON
