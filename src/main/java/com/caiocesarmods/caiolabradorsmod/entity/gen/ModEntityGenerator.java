@@ -39,7 +39,9 @@ public class ModEntityGenerator {
                                                         int weight, int minCount, int maxCount) {
 
         if(!event.getCategory().equals(Biome.Category.THEEND) && !event.getCategory().equals(Biome.Category.NETHER)
-                && !event.getCategory().equals(Biome.Category.OCEAN)) {
+                && !event.getCategory().equals(Biome.Category.OCEAN) && !event.getCategory().equals(Biome.Category.DESERT)
+                && !event.getCategory().equals(Biome.Category.ICY) && !event.getCategory().equals(Biome.Category.MESA)
+                && !event.getCategory().equals(Biome.Category.MUSHROOM) && !event.getCategory().equals(Biome.Category.NONE)) {
             List<MobSpawnInfo.Spawners> base = event.getSpawns().getSpawner(type.getClassification());
             base.add(new MobSpawnInfo.Spawners(type,weight, minCount, maxCount));
         }
