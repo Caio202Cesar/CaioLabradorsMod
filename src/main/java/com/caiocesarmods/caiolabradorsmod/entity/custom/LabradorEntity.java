@@ -143,7 +143,8 @@ public class LabradorEntity extends WolfEntity {
                 && dog.isTamed()
                 && !this.isQueuedToSit()
                 && !dog.isQueuedToSit()
-                && !isMyDog()
+                && !this.isMyDog()
+                && !dog.isMyDog()
                 && this.isInLove()
                 && dog.isInLove();
     }
@@ -253,18 +254,19 @@ public class LabradorEntity extends WolfEntity {
 
         System.out.println(this.isInLove());
 
-        if (!this.isTamed() && stack.getItem() == Items.COD
-                || stack.getItem() == Items.SALMON
-                || stack.getItem() == Items.BEEF
-                || stack.getItem() == Items.MUTTON
-                || stack.getItem() == Items.CHICKEN
-                || stack.getItem() == Items.APPLE
-                || stack.getItem() == Items.TROPICAL_FISH
-                || stack.getItem() == Items.PORKCHOP
-                || stack.getItem() == Items.SWEET_BERRIES
-                || stack.getItem() == Items.RABBIT
-                || stack.getItem() == Items.GOLDEN_APPLE
-                || stack.getItem() == Items.MELON_SLICE) {
+        if (!this.isTamed() && (
+                stack.getItem() == Items.COD
+                        || stack.getItem() == Items.SALMON
+                        || stack.getItem() == Items.BEEF
+                        || stack.getItem() == Items.MUTTON
+                        || stack.getItem() == Items.CHICKEN
+                        || stack.getItem() == Items.APPLE
+                        || stack.getItem() == Items.TROPICAL_FISH
+                        || stack.getItem() == Items.PORKCHOP
+                        || stack.getItem() == Items.SWEET_BERRIES
+                        || stack.getItem() == Items.RABBIT
+                        || stack.getItem() == Items.GOLDEN_APPLE
+                        || stack.getItem() == Items.MELON_SLICE)) {
 
             if (!this.world.isRemote) {
                 if (this.rand.nextInt(3) == 0) {
